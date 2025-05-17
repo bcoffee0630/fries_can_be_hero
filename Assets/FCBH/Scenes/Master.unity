@@ -1357,6 +1357,65 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1147442705
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1147442707}
+  - component: {fileID: 1147442706}
+  m_Layer: 0
+  m_Name: RuntimeGestureRecognizer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1147442706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1147442705}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 376ba96d7c6b248aca13183f5690ad82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  linePrefab: {fileID: 809177124696835202, guid: 3bfc24c73fdca4a8d8a52862d691e3d5, type: 3}
+  drawAreaX: 0.1
+  drawAreaY: 0.1
+  drawAreaWidth: 0.8
+  drawAreaHeight: 0.8
+  autoRecognizeDelay: 1
+  onDrawStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onGestureRecognized:
+    m_PersistentCalls:
+      m_Calls: []
+  onDrawEnd:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!4 &1147442707
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1147442705}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1150501353
 GameObject:
   m_ObjectHideFlags: 0
@@ -3060,6 +3119,7 @@ SceneRoots:
   - {fileID: 619394802}
   - {fileID: 1552616528}
   - {fileID: 872722928}
+  - {fileID: 1147442707}
   - {fileID: 969158213}
   - {fileID: 1150501354}
   - {fileID: 1122032392}
