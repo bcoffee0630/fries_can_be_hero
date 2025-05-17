@@ -13,18 +13,14 @@ namespace FCBH
 {
     public class RuntimeGestureRecognizer : MonoBehaviour
     {
-        [Header("Settings")]
-        [SerializeField] private Transform linePrefab;
-        [Range(0f, 1f), SerializeField] private float drawAreaX = 0.1f;
-        [Range(0f, 1f), SerializeField] private float drawAreaY = 0.1f;
-        [Range(0f, 1f), SerializeField] private float drawAreaWidth = 0.8f;
-        [Range(0f, 1f), SerializeField] private float drawAreaHeight = 0.8f;
-        [SerializeField] private float autoRecognizeDelay = 1f;
+        [SerializeField] private bool isActive;
+        [SerializeField] private GameConfig config;
 
-        public event Action OnDrawStart;
-        public event Action<Result> OnGestureRecognized;
-        public event Action OnDrawEnd;
+        public static event Action OnDrawStart;
+        public static event Action<Result> OnGestureRecognized;
+        public static event Action OnDrawEnd;
 
+        private bool _isDrawAreaInitialized = false;
         private List<Point> _points = new();
         private List<LineRenderer> _gestureLines = new();
         private LineRenderer _currentLine;
@@ -35,6 +31,12 @@ namespace FCBH
         private List<Gesture> _trainingSet = new();
         private Coroutine _autoRecognizeCoroutine;
         private Rect _drawArea;
+
+        public bool IsActive
+        {
+            get => isActive;
+            set => isActive = value;
+        }
 
         private const string EDITOR_PRE_TRAINING_GESTURE_PATH = "GestureSets";
 
@@ -69,16 +71,28 @@ namespace FCBH
 
         private void UpdateDrawArea()
         {
-            _drawArea = new Rect(
-                Screen.width * drawAreaX,
-                Screen.height * drawAreaY,
-                Screen.width * drawAreaWidth,
-                Screen.height * drawAreaHeight
-            );
+            if (!IsActive)
+                return;
+            
+            if (_isDrawAreaInitialized)
+                return;
+            _isDrawAreaInitialized = true;
+            
+            if (config)
+            {
+                _drawArea = new Rect(
+                    Screen.width * config.DrawAreaX,
+                    Screen.height * config.DrawAreaY,
+                    Screen.width * config.DrawAreaWidth,
+                    Screen.height * config.DrawAreaHeight
+                );
+            }
         }
 
         private void Update()
         {
+            if (!isActive)
+                return;
             HandleInput();
         }
 
@@ -86,6 +100,7 @@ namespace FCBH
 
         private void HandleInput()
         {
+            UpdateDrawArea();
 #if UNITY_EDITOR || UNITY_STANDALONE
             _inputPosition = Input.mousePosition;
             if (Input.GetMouseButtonDown(0) && _drawArea.Contains(_inputPosition)) BeginDraw();
@@ -110,7 +125,7 @@ namespace FCBH
             _vertexCount = 0;
             if (_autoRecognizeCoroutine != null) StopCoroutine(_autoRecognizeCoroutine);
 
-            GameObject lineObj = Instantiate(linePrefab.gameObject);
+            GameObject lineObj = Instantiate(config.GesturePrefab.gameObject);
             _currentLine = lineObj.GetComponent<LineRenderer>();
             _gestureLines.Add(_currentLine);
             OnDrawStart?.Invoke();
@@ -132,7 +147,7 @@ namespace FCBH
 
         private IEnumerator AutoRecognizeAfterDelay()
         {
-            yield return new WaitForSeconds(autoRecognizeDelay);
+            yield return new WaitForSeconds(config.RecognizeDelay);
             RecognizeGesture();
             ClearDrawing();
         }
