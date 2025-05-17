@@ -3,39 +3,42 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.Networking;
 using PDollarGestureRecognizer;
+
+#if !UNITY_EDITOR
+using UnityEngine.Networking;
+#endif
 
 namespace FCBH
 {
     public class RuntimeGestureRecognizer : MonoBehaviour
     {
         [Header("Settings")]
-        public Transform linePrefab;
-        [Range(0f, 1f)] public float drawAreaX = 0.1f;
-        [Range(0f, 1f)] public float drawAreaY = 0.1f;
-        [Range(0f, 1f)] public float drawAreaWidth = 0.8f;
-        [Range(0f, 1f)] public float drawAreaHeight = 0.8f;
-        public float autoRecognizeDelay = 1f;
+        [SerializeField] private Transform linePrefab;
+        [Range(0f, 1f), SerializeField] private float drawAreaX = 0.1f;
+        [Range(0f, 1f), SerializeField] private float drawAreaY = 0.1f;
+        [Range(0f, 1f), SerializeField] private float drawAreaWidth = 0.8f;
+        [Range(0f, 1f), SerializeField] private float drawAreaHeight = 0.8f;
+        [SerializeField] private float autoRecognizeDelay = 1f;
 
-        [Header("Events")]
-        public UnityEvent onDrawStart;
-        public UnityEvent<string> onGestureRecognized;
-        public UnityEvent onDrawEnd;
+        public event Action OnDrawStart;
+        public event Action<Result> OnGestureRecognized;
+        public event Action OnDrawEnd;
+
+        private List<Point> _points = new();
+        private List<LineRenderer> _gestureLines = new();
+        private LineRenderer _currentLine;
+        private int _strokeId = -1;
+        private int _vertexCount = 0;
+        private Vector3 _inputPosition;
+        private bool _isDrawing = false;
+        private List<Gesture> _trainingSet = new();
+        private Coroutine _autoRecognizeCoroutine;
+        private Rect _drawArea;
 
         private const string EDITOR_PRE_TRAINING_GESTURE_PATH = "GestureSets";
-        private List<Point> points = new List<Point>();
-        private List<LineRenderer> gestureLines = new List<LineRenderer>();
-        private LineRenderer currentLine;
-        private int strokeId = -1;
-        private int vertexCount = 0;
-        private Vector3 inputPosition;
-        private bool isDrawing = false;
 
-        private List<Gesture> trainingSet = new List<Gesture>();
-        private Coroutine autoRecognizeCoroutine;
-        private Rect drawArea;
+        #region Unity methods
 
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
@@ -44,8 +47,8 @@ namespace FCBH
 
             UpdateDrawArea();
 
-            Vector3 bottomLeft = Camera.main.ScreenToWorldPoint(new Vector3(drawArea.xMin, drawArea.yMin, 10));
-            Vector3 topRight = Camera.main.ScreenToWorldPoint(new Vector3(drawArea.xMax, drawArea.yMax, 10));
+            Vector3 bottomLeft = Camera.main.ScreenToWorldPoint(new Vector3(_drawArea.xMin, _drawArea.yMin, 10));
+            Vector3 topRight = Camera.main.ScreenToWorldPoint(new Vector3(_drawArea.xMax, _drawArea.yMax, 10));
 
             Vector3 topLeft = new Vector3(bottomLeft.x, topRight.y, bottomLeft.z);
             Vector3 bottomRight = new Vector3(topRight.x, bottomLeft.y, bottomLeft.z);
@@ -66,7 +69,7 @@ namespace FCBH
 
         private void UpdateDrawArea()
         {
-            drawArea = new Rect(
+            _drawArea = new Rect(
                 Screen.width * drawAreaX,
                 Screen.height * drawAreaY,
                 Screen.width * drawAreaWidth,
@@ -79,50 +82,52 @@ namespace FCBH
             HandleInput();
         }
 
+        #endregion
+
         private void HandleInput()
         {
 #if UNITY_EDITOR || UNITY_STANDALONE
-            inputPosition = Input.mousePosition;
-            if (Input.GetMouseButtonDown(0) && drawArea.Contains(inputPosition)) BeginDraw();
-            if (Input.GetMouseButton(0) && isDrawing) ContinueDraw();
-            if (Input.GetMouseButtonUp(0) && isDrawing) EndDraw();
+            _inputPosition = Input.mousePosition;
+            if (Input.GetMouseButtonDown(0) && _drawArea.Contains(_inputPosition)) BeginDraw();
+            if (Input.GetMouseButton(0) && _isDrawing) ContinueDraw();
+            if (Input.GetMouseButtonUp(0) && _isDrawing) EndDraw();
 #elif UNITY_ANDROID || UNITY_IOS
             if (Input.touchCount > 0)
             {
                 Touch touch = Input.GetTouch(0);
-                inputPosition = touch.position;
-                if (touch.phase == TouchPhase.Began && drawArea.Contains(inputPosition)) BeginDraw();
-                if (touch.phase == TouchPhase.Moved && isDrawing) ContinueDraw();
-                if ((touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) && isDrawing) EndDraw();
+                _inputPosition = touch.position;
+                if (touch.phase == TouchPhase.Began && _drawArea.Contains(_inputPosition)) BeginDraw();
+                if (touch.phase == TouchPhase.Moved && _isDrawing) ContinueDraw();
+                if ((touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) && _isDrawing) EndDraw();
             }
 #endif
         }
 
         private void BeginDraw()
         {
-            isDrawing = true;
-            strokeId++;
-            vertexCount = 0;
-            if (autoRecognizeCoroutine != null) StopCoroutine(autoRecognizeCoroutine);
+            _isDrawing = true;
+            _strokeId++;
+            _vertexCount = 0;
+            if (_autoRecognizeCoroutine != null) StopCoroutine(_autoRecognizeCoroutine);
 
             GameObject lineObj = Instantiate(linePrefab.gameObject);
-            currentLine = lineObj.GetComponent<LineRenderer>();
-            gestureLines.Add(currentLine);
-            onDrawStart?.Invoke();
+            _currentLine = lineObj.GetComponent<LineRenderer>();
+            _gestureLines.Add(_currentLine);
+            OnDrawStart?.Invoke();
         }
 
         private void ContinueDraw()
         {
-            points.Add(new Point(inputPosition.x, -inputPosition.y, strokeId));
-            currentLine.positionCount = ++vertexCount;
-            currentLine.SetPosition(vertexCount - 1, Camera.main.ScreenToWorldPoint(new Vector3(inputPosition.x, inputPosition.y, 10)));
+            _points.Add(new Point(_inputPosition.x, -_inputPosition.y, _strokeId));
+            _currentLine.positionCount = ++_vertexCount;
+            _currentLine.SetPosition(_vertexCount - 1, Camera.main.ScreenToWorldPoint(new Vector3(_inputPosition.x, _inputPosition.y, 10)));
         }
 
         private void EndDraw()
         {
-            isDrawing = false;
-            onDrawEnd?.Invoke();
-            autoRecognizeCoroutine = StartCoroutine(AutoRecognizeAfterDelay());
+            _isDrawing = false;
+            OnDrawEnd?.Invoke();
+            _autoRecognizeCoroutine = StartCoroutine(AutoRecognizeAfterDelay());
         }
 
         private IEnumerator AutoRecognizeAfterDelay()
@@ -134,21 +139,21 @@ namespace FCBH
 
         private void RecognizeGesture()
         {
-            if (points.Count == 0 || trainingSet.Count == 0) return;
-            Gesture candidate = new Gesture(points.ToArray());
-            Result result = PointCloudRecognizer.Classify(candidate, trainingSet.ToArray());
+            if (_points.Count == 0 || _trainingSet.Count == 0) return;
+            Gesture candidate = new Gesture(_points.ToArray());
+            Result result = PointCloudRecognizer.Classify(candidate, _trainingSet.ToArray());
             Debug.Log($"Recognized gesture: {result.GestureClass} ({result.Score})");
-            onGestureRecognized?.Invoke(result.GestureClass);
+            OnGestureRecognized?.Invoke(result);
         }
 
         public void ClearDrawing()
         {
-            points.Clear();
-            foreach (var line in gestureLines)
+            _points.Clear();
+            foreach (var line in _gestureLines)
             {
                 if (line != null) Destroy(line.gameObject);
             }
-            gestureLines.Clear();
+            _gestureLines.Clear();
         }
 
         private IEnumerator LoadGesturesFromStreamingAssets()
@@ -184,7 +189,7 @@ namespace FCBH
                 if (!File.Exists(gesturePath)) continue;
                 string xml = File.ReadAllText(gesturePath);
                 Gesture gesture = GestureIO.ReadGestureFromXML(xml);
-                trainingSet.Add(gesture);
+                _trainingSet.Add(gesture);
 #else
                 UnityWebRequest fileReq = UnityWebRequest.Get(gesturePath);
                 yield return fileReq.SendWebRequest();
@@ -193,7 +198,7 @@ namespace FCBH
                 {
                     string xml = fileReq.downloadHandler.text;
                     Gesture gesture = GestureIO.ReadGestureFromXML(xml);
-                    trainingSet.Add(gesture);
+                    _trainingSet.Add(gesture);
                 }
                 else
                 {

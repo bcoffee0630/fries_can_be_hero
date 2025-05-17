@@ -9,33 +9,35 @@ namespace FCBH
 {
     public class RuntimeGestureRecorder : MonoBehaviour
     {
-        public string gestureName = "MyGesture";
-        public KeyCode saveKey = KeyCode.S;
-        public Transform gestureLinePrefab;
+        [SerializeField] private string gestureName = "MyGesture";
+        [SerializeField] private KeyCode saveKey = KeyCode.S;
+        [SerializeField] private Transform gestureLinePrefab;
 
-        [Range(0f, 1f)] public float drawAreaX = 0.1f;
-        [Range(0f, 1f)] public float drawAreaY = 0.1f;
-        [Range(0f, 1f)] public float drawAreaWidth = 0.8f;
-        [Range(0f, 1f)] public float drawAreaHeight = 0.8f;
+        [Range(0f, 1f), SerializeField] private float drawAreaX = 0.1f;
+        [Range(0f, 1f), SerializeField] private float drawAreaY = 0.1f;
+        [Range(0f, 1f), SerializeField] private float drawAreaWidth = 0.8f;
+        [Range(0f, 1f), SerializeField] private float drawAreaHeight = 0.8f;
 
-        private List<Point> points = new List<Point>();
-        private List<LineRenderer> gestureLinesRenderer = new List<LineRenderer>();
-        private LineRenderer currentLineRenderer;
-        private int strokeId = -1;
-        private int vertexCount = 0;
-        private Rect drawArea;
+        private List<Point> _points = new();
+        private List<LineRenderer> _gestureLinesRenderer = new();
+        private LineRenderer _currentLineRenderer;
+        private int _strokeId = -1;
+        private int _vertexCount = 0;
+        private Rect _drawArea;
 
         private const string EDITOR_PRE_TRAINING_GESTURE_PATH = "GestureSets";
         private const string INDEX_FILENAME = "index.txt";
 
-        void Start()
+        #region Unity methods
+
+        private void Start()
         {
-            drawArea = GestureUtility.GetDrawArea(drawAreaX, drawAreaY, drawAreaWidth, drawAreaHeight);
+            _drawArea = GestureUtility.GetDrawArea(drawAreaX, drawAreaY, drawAreaWidth, drawAreaHeight);
         }
 
-        void Update()
+        private void Update()
         {
-            drawArea = GestureUtility.GetDrawArea(drawAreaX, drawAreaY, drawAreaWidth, drawAreaHeight);
+            _drawArea = GestureUtility.GetDrawArea(drawAreaX, drawAreaY, drawAreaWidth, drawAreaHeight);
 
             Vector3 inputPosition = Vector3.zero;
             bool isPressed = false;
@@ -53,28 +55,36 @@ namespace FCBH
             }
 #endif
 
-            if (drawArea.Contains(inputPosition) && isPressed)
+            if (_drawArea.Contains(inputPosition) && isPressed)
             {
-                points.Add(new Point(inputPosition.x, -inputPosition.y, strokeId));
-                currentLineRenderer.positionCount = ++vertexCount;
-                currentLineRenderer.SetPosition(vertexCount - 1,
+                _points.Add(new Point(inputPosition.x, -inputPosition.y, _strokeId));
+                _currentLineRenderer.positionCount = ++_vertexCount;
+                _currentLineRenderer.SetPosition(_vertexCount - 1,
                     Camera.main.ScreenToWorldPoint(new Vector3(inputPosition.x, inputPosition.y, 10)));
             }
 
-            if (Input.GetKeyDown(saveKey) && points.Count > 0)
+            if (Input.GetKeyDown(saveKey) && _points.Count > 0)
             {
                 SaveGesture();
                 ClearDrawing();
             }
         }
 
+        private void OnGUI()
+        {
+            GUI.Box(_drawArea, "Draw Area");
+            GUI.Label(new Rect(10, Screen.height - 30, 300, 30), $"Press [{saveKey}] to save gesture: {gestureName}");
+        }
+
+        #endregion
+
         private void BeginNewStroke()
         {
-            ++strokeId;
+            ++_strokeId;
             GameObject gestureObj = Instantiate(gestureLinePrefab, Vector3.zero, Quaternion.identity).gameObject;
-            currentLineRenderer = gestureObj.GetComponent<LineRenderer>();
-            gestureLinesRenderer.Add(currentLineRenderer);
-            vertexCount = 0;
+            _currentLineRenderer = gestureObj.GetComponent<LineRenderer>();
+            _gestureLinesRenderer.Add(_currentLineRenderer);
+            _vertexCount = 0;
         }
 
         private void SaveGesture()
@@ -94,7 +104,7 @@ namespace FCBH
                 Directory.CreateDirectory(folderPath);
 
             string fullPath = Path.Combine(folderPath, fileName);
-            GestureIO.WriteGesture(points.ToArray(), gestureName, fullPath);
+            GestureIO.WriteGesture(_points.ToArray(), gestureName, fullPath);
             Debug.Log($"Gesture saved to: {fullPath}");
 
             RebuildIndexFile(folderPath);
@@ -114,20 +124,14 @@ namespace FCBH
 
         private void ClearDrawing()
         {
-            points.Clear();
-            foreach (var line in gestureLinesRenderer)
+            _points.Clear();
+            foreach (var line in _gestureLinesRenderer)
             {
                 if (line != null) Destroy(line.gameObject);
             }
-            gestureLinesRenderer.Clear();
-            strokeId = -1;
-            vertexCount = 0;
-        }
-
-        void OnGUI()
-        {
-            GUI.Box(drawArea, "Draw Area");
-            GUI.Label(new Rect(10, Screen.height - 30, 300, 30), $"Press [{saveKey}] to save gesture: {gestureName}");
+            _gestureLinesRenderer.Clear();
+            _strokeId = -1;
+            _vertexCount = 0;
         }
     }
 }
