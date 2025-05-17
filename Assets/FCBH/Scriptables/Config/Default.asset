@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04f6c1df9305493e8ca60218dfebe7d2, type: 3}
+  m_Name: Default
+  m_EditorClassIdentifier: 
+  time: 60
+  gesturePrefab: {fileID: 809177124696835202, guid: 3bfc24c73fdca4a8d8a52862d691e3d5, type: 3}
+  drawAreaX: 0.1
+  drawAreaY: 0.1
+  drawAreaWidth: 0.8
+  drawAreaHeight: 0.8
+  recognizeDelay: 0.5
+  enemyPrefab: {fileID: 8290522751702638597, guid: a44be6a8ef82c4ffcb344beb36d0b10f, type: 3}
+  gestureVisualDatabase: {fileID: 11400000, guid: 3f517a4a899974af1bf1f52881081b02, type: 2}
+  enemyCreationInterval: 2
+  enemyCreationRandomSeed: 2
+  autoKill: 1
+  autoKillDelay: 3
+  autoKillRandomize: 3
+  enemyAreaX: 0.1
+  enemyAreaY: 0.2
+  enemyAreaWidth: 0.8
+  enemyAreaHeight: 0.6

@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c6a4b72943034794875071d7563aee8, type: 3}
+  m_Name: DefaultDatabase
+  m_EditorClassIdentifier: 
+  gestureVisuals:
+  - gestureName: Circle
+    gestureTexture: {fileID: 21300000, guid: 1e055f76ed62c4931aaffa936c6acb60, type: 3}
+  - gestureName: Down
+    gestureTexture: {fileID: 21300000, guid: ead88b2243cc94873b37152fe723db05, type: 3}
+  - gestureName: Left
+    gestureTexture: {fileID: 21300000, guid: 632d11661db6f462e83bf4e71c9813f0, type: 3}
+  - gestureName: M
+    gestureTexture: {fileID: 21300000, guid: f2cfba4f12a2a4babacb61732ef852de, type: 3}
+  - gestureName: Right
+    gestureTexture: {fileID: 21300000, guid: ff441237855ac495e8c7533fbda7b622, type: 3}
+  - gestureName: Square
+    gestureTexture: {fileID: 21300000, guid: f0aea88cfcf304b4d9bd9b6a4a236ae8, type: 3}
+  - gestureName: Thunder
+    gestureTexture: {fileID: 21300000, guid: 19d9bb22b309e4b11a93f657db98cbf6, type: 3}
+  - gestureName: Tick
+    gestureTexture: {fileID: 21300000, guid: f61c6db0bbe3d48ebbd53b355fec2091, type: 3}
+  - gestureName: Triangle
+    gestureTexture: {fileID: 21300000, guid: e1ce2e017ab8f4bf4a7c81d9a9282ed3, type: 3}
+  - gestureName: Up
+    gestureTexture: {fileID: 21300000, guid: 4599e191f7e17441695c064c1da4d65f, type: 3}
+  - gestureName: X
+    gestureTexture: {fileID: 21300000, guid: 00144ca9569234fd88e9101cb0e22fd9, type: 3}
