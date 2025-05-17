@@ -148,21 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 376ba96d7c6b248aca13183f5690ad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  linePrefab: {fileID: 809177124696835202, guid: 3bfc24c73fdca4a8d8a52862d691e3d5, type: 3}
-  drawAreaX: 0.1
-  drawAreaY: 0.1
-  drawAreaWidth: 0.8
-  drawAreaHeight: 0.8
-  autoRecognizeDelay: 1
-  onDrawStart:
-    m_PersistentCalls:
-      m_Calls: []
-  onGestureRecognized:
-    m_PersistentCalls:
-      m_Calls: []
-  onDrawEnd:
-    m_PersistentCalls:
-      m_Calls: []
+  config: {fileID: 11400000, guid: 2e8ab196a2d134641b2b9ed89a56060f, type: 2}
 --- !u!4 &456104978
 Transform:
   m_ObjectHideFlags: 0

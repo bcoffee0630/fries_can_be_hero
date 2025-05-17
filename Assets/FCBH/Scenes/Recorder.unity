@@ -225,7 +225,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bcb2490d1b3b447d8d7b80f473b390c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gestureName: RightArrow
+  gestureName: M
   saveKey: 115
   gestureLinePrefab: {fileID: 809177124696835202, guid: 3bfc24c73fdca4a8d8a52862d691e3d5, type: 3}
   drawAreaX: 0.1
