@@ -13,16 +13,18 @@ namespace FCBH
 
         #region Unity methods
 
+        private void Awake()
+        {
+            foreach (var state in states)
+            {
+                state.OnInitialize();
+            }
+        }
+
         private void Start()
         {
             if (defaultState != null)
-                EnterState(defaultState);
-        }
-
-        private void Update()
-        {
-            if (_currentState != null && _currentState.StateStatus == BaseState.Status.IsUpdate)
-                _currentState.OnUpdate();
+                ChangeState(defaultState);
         }
 
         #endregion
@@ -30,11 +32,6 @@ namespace FCBH
         private void EnterState(BaseState state)
         {
             state.OnEnter();
-        }
-
-        private void UpdateState(BaseState state)
-        {
-            state.OnUpdate();
         }
 
         private void ExitState(BaseState state)
