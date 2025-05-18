@@ -22,17 +22,20 @@ Be fast. Be precise. Be the hero your city deserves.
 
 ## 📜 License
 
-This project is released under the **MIT License** for GameJam and educational use.
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for more details.
 
-> This project includes source code from the [PDollarUnity](https://github.com/DaVikingCode/PDollar-Unity) project, which is licensed under the BSD 3-Clause License.  
-> The license file is located at:
->
-> `Assets/Plugins/PDollarUnity/LICENSE`
+It also includes the [PDollarUnity](https://github.com/DaVikingCode/PDollar-Unity) gesture recognition library, licensed under the BSD 3-Clause License.  
+You can find its license at: `Assets/Plugins/PDollarUnity/LICENSE`
 
-## 🙌 Contact & Contributions
+## 👥 Contributors
 
-This is a GameJam submission and not currently open for external contributions.  
-Feel free to open an issue for questions or suggestions.
+This game was developed by:
+
+- Ethan Ling ([@bcoffee0630](https://github.com/bcoffee0630))
+- Ernest Tan
+- Kylvin Tay
+
+Special thanks to the team for their creativity and collaboration during the GameJam!
 
 ---
 
