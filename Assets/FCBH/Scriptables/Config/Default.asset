@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Default
   m_EditorClassIdentifier: 
   time: 60
+  reduceTimeOnDamaged: 1
   gesturePrefab: {fileID: 809177124696835202, guid: 3bfc24c73fdca4a8d8a52862d691e3d5, type: 3}
   drawAreaX: 0.1
   drawAreaY: 0.1
@@ -25,8 +26,10 @@ MonoBehaviour:
   enemyCreationRandomSeed: 2
   autoKill: 1
   autoKillDelay: 3
-  autoKillRandomize: 3
+  autoKillRandomize: 1
   enemyAreaX: 0.1
   enemyAreaY: 0.2
   enemyAreaWidth: 0.8
   enemyAreaHeight: 0.6
+  baseScore: 1
+  scoreRandomSeed: 2

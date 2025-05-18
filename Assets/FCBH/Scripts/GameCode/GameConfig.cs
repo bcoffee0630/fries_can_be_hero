@@ -7,6 +7,7 @@ namespace FCBH
     {
         [Header("Settings")]
         [SerializeField] private float time;
+        [SerializeField] private float reduceTimeOnDamaged = 1;
         
         [Header("Settings/Gesture")]
         [SerializeField] private Transform gesturePrefab;
@@ -32,10 +33,15 @@ namespace FCBH
         [Range(0f, 1f), SerializeField] private float enemyAreaY = 0.1f;
         [Range(0f, 1f), SerializeField] private float enemyAreaWidth = 0.8f;
         [Range(0f, 1f), SerializeField] private float enemyAreaHeight = 0.8f;
+
+        [Header("Settings/Score")]
+        [SerializeField] private int baseScore;
+        [SerializeField] private int scoreRandomSeed = 1;
         
         #region Read-only properties
 
         public float Time => time;
+        public float ReduceTimeOnDamaged => reduceTimeOnDamaged;
 
         #region Gesture settings
 
@@ -123,6 +129,21 @@ namespace FCBH
         public float EnemyAreaHeight => enemyAreaHeight;
 
         #endregion
+
+        #endregion
+
+        #region Score settings
+
+        public int GetScore
+        {
+            get
+            {
+                var min = baseScore - scoreRandomSeed;
+                if (min < 0)
+                    min = 0;
+                return Random.Range(min, baseScore + scoreRandomSeed);
+            }
+        }
 
         #endregion
 
