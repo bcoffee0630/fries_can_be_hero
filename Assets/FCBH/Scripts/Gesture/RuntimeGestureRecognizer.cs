@@ -115,11 +115,7 @@ namespace FCBH
 
         private void UpdateInput()
         {
-#if UNITY_EDITOR || UNITY_STANDALONE
-            _inputPosition = Input.mousePosition;
-            if (Input.GetMouseButtonDown(0) && _drawArea.Contains(_inputPosition)) BeginDraw();
-            if (Input.GetMouseButtonUp(0) && _isDrawing) EndDraw();
-#elif UNITY_ANDROID || UNITY_IOS
+#if UNITY_ANDROID || UNITY_IOS
     if (Input.touchCount > 0)
     {
         Touch touch = Input.GetTouch(0);
@@ -127,6 +123,10 @@ namespace FCBH
         if (touch.phase == TouchPhase.Began && _drawArea.Contains(_inputPosition)) BeginDraw();
         if ((touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) && _isDrawing) EndDraw();
     }
+#else
+            _inputPosition = Input.mousePosition;
+            if (Input.GetMouseButtonDown(0) && _drawArea.Contains(_inputPosition)) BeginDraw();
+            if (Input.GetMouseButtonUp(0) && _isDrawing) EndDraw();
 #endif
         }
 
