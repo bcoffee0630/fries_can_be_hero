@@ -35,7 +35,12 @@ namespace FCBH
         public bool IsActive
         {
             get => isActive;
-            set => isActive = value;
+            set
+            {
+                isActive = value;
+                if (!isActive)
+                    ClearDrawing();
+            }
         }
 
         private const string EDITOR_PRE_TRAINING_GESTURE_PATH = "GestureSets";
