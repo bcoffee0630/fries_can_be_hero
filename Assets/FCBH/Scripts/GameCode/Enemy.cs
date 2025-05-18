@@ -57,7 +57,8 @@ namespace FCBH
             for (var x = CreatedEnemies.Count - 1; x >= 0; x--)
             {
                 var createdEnemy = CreatedEnemies[x];
-                Destroy(createdEnemy.gameObject);
+                if (createdEnemy)
+                    Destroy(createdEnemy.gameObject);
                 CreatedEnemies.RemoveAt(x);
             }
         }

@@ -51,6 +51,8 @@ namespace FCBH
             while (_processing)
             {
                 yield return new WaitForSeconds(config.EnemyCreationInterval);
+                if (!_processing)
+                    break;
                 Instantiate(config.EnemyPrefab, config.EnemyCreationRandomPosition, Quaternion.identity);
                 yield return null; // thread safety.
             }
