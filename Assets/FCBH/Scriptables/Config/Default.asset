@@ -19,7 +19,7 @@ MonoBehaviour:
   drawAreaY: 0.1
   drawAreaWidth: 0.8
   drawAreaHeight: 0.8
-  recognizeDelay: 0.5
+  recognizeDelay: 0.35
   enemyPrefab: {fileID: 8290522751702638597, guid: a44be6a8ef82c4ffcb344beb36d0b10f, type: 3}
   gestureVisualDatabase: {fileID: 11400000, guid: 3f517a4a899974af1bf1f52881081b02, type: 2}
   enemyCreationInterval: 2
@@ -31,5 +31,5 @@ MonoBehaviour:
   enemyAreaY: 0.2
   enemyAreaWidth: 0.8
   enemyAreaHeight: 0.6
-  baseScore: 1
+  baseScore: 3
   scoreRandomSeed: 2
