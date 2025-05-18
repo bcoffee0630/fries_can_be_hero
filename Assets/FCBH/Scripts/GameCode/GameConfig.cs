@@ -139,8 +139,8 @@ namespace FCBH
             get
             {
                 var min = baseScore - scoreRandomSeed;
-                if (min < 0)
-                    min = 0;
+                if (min < 1)
+                    min = 1;
                 return Random.Range(min, baseScore + scoreRandomSeed);
             }
         }
