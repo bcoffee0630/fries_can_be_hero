@@ -76,3 +76,6 @@ crashlytics-build.properties
 
 # Mac auto-generated
 .DS_Store
+
+# Auto-generated when build
+/.utmp/*
