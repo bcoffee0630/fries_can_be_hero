@@ -10,5 +10,5 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3645a92b67f4146bc9c2fcefb04273df, type: 3}
-  m_Name: LobbyNewGamePressed
+  m_Name: OnClicked-Menu-Start
   m_EditorClassIdentifier: 
