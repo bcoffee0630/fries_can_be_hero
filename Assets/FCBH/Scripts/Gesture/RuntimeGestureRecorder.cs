@@ -9,7 +9,25 @@ namespace FCBH
 {
     public class RuntimeGestureRecorder : MonoBehaviour
     {
-        [SerializeField] private string gestureName = "MyGesture";
+        #region Structure
+
+        public enum TargetShape
+        {
+            Circle,
+            Down,
+            Left,
+            Right,
+            Square,
+            Thunder,
+            Tick,
+            Triangle,
+            Up,
+            X,
+        }
+
+        #endregion
+        
+        [SerializeField] private TargetShape gestureShape = TargetShape.Circle;
         [SerializeField] private KeyCode saveKey = KeyCode.S;
         [SerializeField] private Transform gestureLinePrefab;
 
@@ -73,7 +91,7 @@ namespace FCBH
         private void OnGUI()
         {
             GUI.Box(_drawArea, "Draw Area");
-            GUI.Label(new Rect(10, Screen.height - 30, 300, 30), $"Press [{saveKey}] to save gesture: {gestureName}");
+            GUI.Label(new Rect(10, Screen.height - 30, 300, 30), $"Press [{saveKey}] to save gesture: {gestureShape}");
         }
 
         #endregion
@@ -89,7 +107,7 @@ namespace FCBH
 
         private void SaveGesture()
         {
-            string fileName = $"{gestureName}.xml";
+            string fileName = $"{gestureShape}.xml";
             string folderPath = "";
 
 #if UNITY_EDITOR
@@ -104,7 +122,7 @@ namespace FCBH
                 Directory.CreateDirectory(folderPath);
 
             string fullPath = Path.Combine(folderPath, fileName);
-            GestureIO.WriteGesture(_points.ToArray(), gestureName, fullPath);
+            GestureIO.WriteGesture(_points.ToArray(), gestureShape.ToString(), fullPath);
             Debug.Log($"Gesture saved to: {fullPath}");
 
             RebuildIndexFile(folderPath);
