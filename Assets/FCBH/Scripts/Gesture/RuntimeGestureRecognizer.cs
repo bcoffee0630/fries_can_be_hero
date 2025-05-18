@@ -31,6 +31,8 @@ namespace FCBH
         private List<Gesture> _trainingSet = new();
         private Coroutine _autoRecognizeCoroutine;
         private Rect _drawArea;
+        private Vector2? _lastDrawPos = null;
+        private const float MinPointDistance = 2f;
 
         public bool IsActive
         {
@@ -98,28 +100,33 @@ namespace FCBH
         {
             if (!isActive)
                 return;
-            HandleInput();
+
+            UpdateDrawArea();
+            UpdateInput();
+        }
+        
+        private void LateUpdate()
+        {
+            if (_isDrawing)
+                ContinueDraw();
         }
 
         #endregion
 
-        private void HandleInput()
+        private void UpdateInput()
         {
-            UpdateDrawArea();
 #if UNITY_EDITOR || UNITY_STANDALONE
             _inputPosition = Input.mousePosition;
             if (Input.GetMouseButtonDown(0) && _drawArea.Contains(_inputPosition)) BeginDraw();
-            if (Input.GetMouseButton(0) && _isDrawing) ContinueDraw();
             if (Input.GetMouseButtonUp(0) && _isDrawing) EndDraw();
 #elif UNITY_ANDROID || UNITY_IOS
-            if (Input.touchCount > 0)
-            {
-                Touch touch = Input.GetTouch(0);
-                _inputPosition = touch.position;
-                if (touch.phase == TouchPhase.Began && _drawArea.Contains(_inputPosition)) BeginDraw();
-                if (touch.phase == TouchPhase.Moved && _isDrawing) ContinueDraw();
-                if ((touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) && _isDrawing) EndDraw();
-            }
+    if (Input.touchCount > 0)
+    {
+        Touch touch = Input.GetTouch(0);
+        _inputPosition = touch.position;
+        if (touch.phase == TouchPhase.Began && _drawArea.Contains(_inputPosition)) BeginDraw();
+        if ((touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) && _isDrawing) EndDraw();
+    }
 #endif
         }
 
@@ -128,6 +135,8 @@ namespace FCBH
             _isDrawing = true;
             _strokeId++;
             _vertexCount = 0;
+            _lastDrawPos = null;
+
             if (_autoRecognizeCoroutine != null) StopCoroutine(_autoRecognizeCoroutine);
 
             GameObject lineObj = Instantiate(config.GesturePrefab.gameObject);
@@ -138,9 +147,17 @@ namespace FCBH
 
         private void ContinueDraw()
         {
-            _points.Add(new Point(_inputPosition.x, -_inputPosition.y, _strokeId));
+            Vector2 currentPos = new Vector2(_inputPosition.x, _inputPosition.y);
+
+            if (_lastDrawPos.HasValue && Vector2.Distance(currentPos, _lastDrawPos.Value) < MinPointDistance)
+                return;
+
+            _lastDrawPos = currentPos;
+
+            _points.Add(new Point(currentPos.x, -currentPos.y, _strokeId));
             _currentLine.positionCount = ++_vertexCount;
-            _currentLine.SetPosition(_vertexCount - 1, Camera.main.ScreenToWorldPoint(new Vector3(_inputPosition.x, _inputPosition.y, 10)));
+            _currentLine.SetPosition(_vertexCount - 1,
+                Camera.main.ScreenToWorldPoint(new Vector3(currentPos.x, currentPos.y, 10)));
         }
 
         private void EndDraw()
