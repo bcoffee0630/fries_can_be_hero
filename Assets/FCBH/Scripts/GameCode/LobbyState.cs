@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 namespace FCBH
@@ -5,6 +6,21 @@ namespace FCBH
     public class LobbyState : BaseState
     {
         [SerializeField] private GameObject lobbyCanvas; // todo animate if have time
+        [SerializeField] private TextMeshProUGUI rankVisual;
+
+        #region Unity methods
+
+        private void OnEnable()
+        {
+            RankSystem.OnRankingChanged += UpdateRanking;
+        }
+
+        private void OnDisable()
+        {
+            RankSystem.OnRankingChanged -= UpdateRanking;
+        }
+
+        #endregion
         
         public override void OnInitialize()
         {
@@ -19,6 +35,12 @@ namespace FCBH
         public override void OnExit()
         {
             lobbyCanvas.SetActive(false);
+        }
+
+        private void UpdateRanking(string rank)
+        {
+            if (rankVisual)
+                rankVisual.SetText(rank);
         }
     }
 }
