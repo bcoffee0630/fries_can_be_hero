@@ -13,8 +13,12 @@ namespace FCBH
             Screen.SetResolution(
                 Screen.currentResolution.width,
                 Screen.currentResolution.height,
-                true,
-                120
+                FullScreenMode.FullScreenWindow,
+                new RefreshRate
+                {
+                    numerator = 120,
+                    denominator = 1,
+                }
             );
         }
 
