@@ -18,6 +18,7 @@ namespace FCBH
         [SerializeField] private StateManager stateManager;
 
         private const string LOBBY_STATE = "Lobby";
+        private const string ENEMY_POOL_TAG = "Enemy";
         
         #region Unity methods
 
@@ -63,6 +64,12 @@ namespace FCBH
             hud.SetActive(false);
             rank.SetActive(false);
             Enemy.KillAllEnemies();
+            
+            // Clear the enemy pool when exiting the game state
+            if (ObjectPoolManager.Instance != null)
+            {
+                ObjectPoolManager.Instance.ClearPool(ENEMY_POOL_TAG);
+            }
         }
 
         private void DisplayRank()

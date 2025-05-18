@@ -6,10 +6,18 @@ namespace FCBH
     public class EnemyCreator : MonoBehaviour
     {
         [SerializeField] private GameConfig config;
+        [SerializeField] private int initialPoolSize = 20;
         
         private bool _processing;
+        private const string ENEMY_POOL_TAG = "Enemy";
 
         #region Unity methods
+
+        private void Awake()
+        {
+            // Initialize the enemy pool when the game starts
+            InitializeEnemyPool();
+        }
 
 #if UNITY_EDITOR
         private void OnDrawGizmos()
@@ -33,6 +41,18 @@ namespace FCBH
 
         #endregion
 
+        private void InitializeEnemyPool()
+        {
+            if (config != null && config.EnemyPrefab != null)
+            {
+                ObjectPoolManager.Instance.CreatePool(ENEMY_POOL_TAG, config.EnemyPrefab.gameObject, initialPoolSize);
+            }
+            else
+            {
+                Debug.LogError("Enemy prefab is not assigned in GameConfig!");
+            }
+        }
+
         public void StartProcess()
         {
             _processing = true;
@@ -53,7 +73,14 @@ namespace FCBH
                 yield return new WaitForSeconds(config.EnemyCreationInterval);
                 if (!_processing)
                     break;
-                Instantiate(config.EnemyPrefab, config.EnemyCreationRandomPosition, Quaternion.identity);
+                
+                // Get enemy from pool instead of instantiating
+                GameObject enemyObj = ObjectPoolManager.Instance.GetObjectFromPool(
+                    ENEMY_POOL_TAG, 
+                    config.EnemyCreationRandomPosition, 
+                    Quaternion.identity
+                );
+                
                 yield return null; // thread safety.
             }
             

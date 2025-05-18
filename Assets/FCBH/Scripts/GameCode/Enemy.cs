@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using PDollarGestureRecognizer;
 using UnityEngine;
 using UnityEngine.UI;
-using Random = UnityEngine.Random;
 
 namespace FCBH
 {
@@ -13,54 +12,83 @@ namespace FCBH
         [SerializeField] private GameConfig config;
         
         private string _gesture;
-
+        private float _autoKillDelayId;
+        
         private static List<Enemy> CreatedEnemies = new();
+        private const string ENEMY_POOL_TAG = "Enemy";
 
         public static event Action OnRunAway;
         public static event Action OnKill;
 
         #region Unity methods
 
-        private void Start()
+        private void OnEnable()
         {
             if (!CreatedEnemies.Contains(this))
                 CreatedEnemies.Add(this);
             
+            Initialize();
+        }
+        
+        private void OnDisable()
+        {
+            CancelInvoke(nameof(RunAway));
+            
+            if (CreatedEnemies.Contains(this))
+                CreatedEnemies.Remove(this);
+        }
+
+        #endregion
+
+        public void Initialize()
+        {
             _gesture = GestureUtility.GetRandomGesture();
             var texture = config.GestureVisualDatabase.GetGestureVisual(_gesture);
             visual.sprite = texture.gestureTexture;
             
             if (config.AutoKill)
-                Invoke(nameof(RunAway), config.AutoKillDelay); // todo set randomize time
+                Invoke(nameof(RunAway), config.AutoKillDelay);
         }
-
-        #endregion
 
         public void TryKill(Result result)
         {
             if (result.GestureClass != _gesture)
                 return;
+                
             OnKill?.Invoke();
-            Destroy(gameObject); // todo pooling, animate, effect
+            ReturnToPool();
         }
 
         private void RunAway()
         {
             OnRunAway?.Invoke();
-            Destroy(gameObject); // todo pooling, animate, effect
+            ReturnToPool();
+        }
+        
+        private void ReturnToPool()
+        {
+            // Return to pool instead of destroying
+            ObjectPoolManager.Instance.ReturnObjectToPool(gameObject, ENEMY_POOL_TAG);
         }
 
         public static void KillAllEnemies()
         {
             if (CreatedEnemies.Count == 0)
                 return;
-            for (var x = CreatedEnemies.Count - 1; x >= 0; x--)
+                
+            // Use a temporary list to avoid modification during iteration
+            List<Enemy> enemiesToKill = new List<Enemy>(CreatedEnemies);
+            
+            foreach (var enemy in enemiesToKill)
             {
-                var createdEnemy = CreatedEnemies[x];
-                if (createdEnemy)
-                    Destroy(createdEnemy.gameObject);
-                CreatedEnemies.RemoveAt(x);
+                if (enemy != null && enemy.gameObject != null)
+                {
+                    // Return to pool instead of destroying
+                    ObjectPoolManager.Instance.ReturnObjectToPool(enemy.gameObject, ENEMY_POOL_TAG);
+                }
             }
+            
+            CreatedEnemies.Clear();
         }
     }
 }
