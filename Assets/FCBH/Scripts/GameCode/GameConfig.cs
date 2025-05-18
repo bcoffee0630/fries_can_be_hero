@@ -99,6 +99,28 @@ namespace FCBH
                 Screen.height * enemyAreaHeight
             );
 
+        public HorizontalDirection EnemyHorizontalDirection(Vector3 position)
+        {
+            if (Camera.main == null)
+                return HorizontalDirection.Middle;
+            
+            var min = Camera.main.ScreenToWorldPoint(new Vector3(EnemyAreaRect.xMin, EnemyAreaRect.y / 2, 10));
+            var max = Camera.main.ScreenToWorldPoint(new Vector3(EnemyAreaRect.xMax, EnemyAreaRect.y / 2, 10));
+            var delta = (max - min) / 3;
+            delta.y = 0;
+            delta.z = 0;
+            
+            var firstSection = min + delta;
+            var secondSection = firstSection + delta;
+
+            if (position.x >= min.x && position.x < firstSection.x)
+                return HorizontalDirection.Left;
+            else if (position.x >= firstSection.x && position.x < secondSection.x)
+                return HorizontalDirection.Middle;
+            else
+                return HorizontalDirection.Right;
+        }
+
         #endregion
         
         #region Enemy auto-kill
@@ -148,5 +170,12 @@ namespace FCBH
         #endregion
 
         #endregion
+    }
+
+    public enum HorizontalDirection
+    {
+        Left,
+        Middle,
+        Right
     }
 }

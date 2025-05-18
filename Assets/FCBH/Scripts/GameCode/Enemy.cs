@@ -8,7 +8,9 @@ namespace FCBH
 {
     public class Enemy : MonoBehaviour
     {
-        [SerializeField] private SpriteRenderer visual;
+        [SerializeField] private SpriteRenderer gestureVisual;
+        [SerializeField] private SpriteRenderer enemyVisual;
+        [SerializeField] private Sprite[] enemyDirection;
         [SerializeField] private GameConfig config;
         
         private string _gesture;
@@ -44,7 +46,12 @@ namespace FCBH
         {
             _gesture = GestureUtility.GetRandomGesture();
             var texture = config.GestureVisualDatabase.GetGestureVisual(_gesture);
-            visual.sprite = texture.gestureTexture;
+            gestureVisual.sprite = texture.gestureTexture;
+            
+            var position = transform.position;
+            var direction = (int)config.EnemyHorizontalDirection(position);
+            if (direction < enemyDirection.Length)
+                enemyVisual.sprite = enemyDirection[direction];
             
             if (config.AutoKill)
                 Invoke(nameof(RunAway), config.AutoKillDelay);
