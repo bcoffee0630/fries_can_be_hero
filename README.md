@@ -2,6 +2,8 @@
 
 **FriesCanBeHero** is a light-hearted arcade-style game created for a GameJam.
 
+Click here to play the game 👉 [itch.io](https://yuki414913.itch.io/fries-can-be-heroes-too)
+
 ## 🧠 Concept
 
 In a city plagued by **French Fry Withdrawal Syndrome**, only one hero can bring salvation—**you**!  
